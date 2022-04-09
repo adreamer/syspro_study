@@ -14,8 +14,8 @@ int main(int argc, char *argv[]) {
 	mode_t mode;
 	char buf[3][BUFSIZ];
 	int nr;
-    struct iovec iov[3];
-    int eof = 0;
+	struct iovec iov[3];
+	int eof = 0;
 
 	// time
 	struct tms timebuf;
@@ -50,17 +50,17 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-    for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 3; i++) {
 		iov[i].iov_base = buf[i];
 		iov[i].iov_len = sizeof(buf[i]);
 	}
-    while (!eof) {
+	while (!eof) {
    	nr = readv(sourcefd, iov, 3);
-    	if (nr == -1) {
+		if (nr == -1) {
 		perror ("readv");
 		return 1;
 	}
-    if (nr < BUFSIZ * 3) {
+	if (nr < BUFSIZ * 3) {
 		int remain = nr;
 		for (int i=0; i<3; i++) {
 			if (remain < BUFSIZ) {
@@ -70,16 +70,16 @@ int main(int argc, char *argv[]) {
 				remain -= BUFSIZ;
 			}
 		}
-        	eof = 1;
-    	}
-    	//printf("read %d bytes\n", nr);
-    	nr = writev(destfd, iov, 3);
-    	if (nr == -1) {
-            perror ("writev");
-            return 1;
-        }
-	    //printf("wrote %d bytes\n", nr);
-    }
+			eof = 1;
+		}
+		//printf("read %d bytes\n", nr);
+		nr = writev(destfd, iov, 3);
+		if (nr == -1) {
+			perror ("writev");
+			return 1;
+		}
+		//printf("wrote %d bytes\n", nr);
+	}
 
 	close(sourcefd);
 	close(destfd);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-    printf("Time : %.1f sec\n", (double)(t2 - t1) / ct);
+	printf("Time : %.1f sec\n", (double)(t2 - t1) / ct);
 
 	return 0;
 }
