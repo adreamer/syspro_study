@@ -26,7 +26,7 @@ void *start_thread (void *message) {
     int ret;
     const pthread_t me = pthread_self();
 
-    ret = pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &unused);
+    ret = pthread_setcancelstate(PTHREAD_CANCEL_DEFERRED, &unused);
     
     printf("[%d] thread : %s\n", gettid(), (char*)message);
     sleep(1);
@@ -49,7 +49,7 @@ void *end_thread (void *a) {
 
 int main() {
     pthread_t thread1, thread3;
-    char * result;
+    void * result;
 
     pthread_create(&thread1, NULL, start_thread, "thread1");
     pthread_create(&thread2, NULL, start_thread, "thread2");
@@ -62,10 +62,14 @@ int main() {
     }
 
     pthread_detach(thread3);
-    pthread_join(thread1, (void**)&result);
-    printf("thread1: %s\n", result);
-    pthread_join(thread2, (void**)&result);
-    printf("thread2: %s\n", result);
+    pthread_join(thread1, &result);
+    printf("thread1: %s\n", (char*)result);
+    pthread_join(thread2, &result);
+    if (result == PTHREAD_CANCELED) {
+        printf("thread2 canceled\n");
+    } else {
+        printf("thread2: %s\n", (char*)result);
+    }
 
     return 0;
 }
