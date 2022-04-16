@@ -8,19 +8,21 @@
 #include <dirent.h>
 #include <string.h>
 
-#define BUF_LEN BUFSIZ
 #define DEBUG
 #ifdef DEBUG
 #define LOG(...) printf(__VA_ARGS__)
 #else
 #define LOG(...)
 #endif
-    
 
-int is_recursive = 0;
+// cp -r source dest
+// source는 fd로, destination은 current working directory로 관리
+
+int is_recursive = 0; // directory copy 여부
 
 void copy(int sdirfd, char *source, char *dest);
 
+// 파일복사. sdirfd = current source directory
 void copy_file(int sdirfd, char *source, char *dest)
 {
     int sourcefd;
@@ -59,6 +61,10 @@ void copy_file(int sdirfd, char *source, char *dest)
     fclose(destfile);
 }
 
+// 디렉토리 복사.
+// sdirfd는 parent dir이고 source는 디렉토리이므로 fd를 얻고 다음 sdirfd로 이용
+// dest 디렉토리 생성후 chdir함
+// source entry별로 다시 copy 처리
 void copy_dir(int sdirfd, char *source, char *dest) {
     int swd_fd, sourcefd;
     struct dirent *entry;
@@ -102,6 +108,7 @@ void copy_dir(int sdirfd, char *source, char *dest) {
     close(swd_fd);
 }
 
+// 파일이냐 디렉토리냐에 따라 분기 copy
 void copy(int sdirfd, char *source, char *dest)
 {
     struct stat sb;
